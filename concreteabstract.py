@@ -9,10 +9,12 @@ from sklearn import metrics
 from sklearn.linear_model import LogisticRegression
 from collections import defaultdict as dd
 from operator import itemgetter
+from copy import deepcopy
 
 class ConcreteAbstract:
     
-    def __init__(self, word_vectors, concr_scores, word_net, pos_count = 10, neg_count = 20):
+    def __init__(self, word_vectors, concr_scores, word_net, pos_count=10, neg_count=20):
+        global tqdm
         self.word_vectors = word_vectors
         self.concr_scores = concr_scores
         self.wn = word_net
@@ -20,6 +22,7 @@ class ConcreteAbstract:
         self.neg_count = neg_count
         self.test_pct = 'tbd'
         self.min_rating = 'tbd'
+        self.tqdm_hold = tqdm
 
         
     ########################################
@@ -451,8 +454,15 @@ class ConcreteAbstract:
     
     def get_lemma_count(self):
         sum(len(ss.lemmas()) for ss in self._get_classifier_capable())
+    
+    def set_verbose(self, verbose=True):
+        global tqdm
+        if verbose:
+            tqdm = self.hold_tqdm
+        else:
+            tqdm = lambda x:x
         
-    def build_all(self, min_rating=8, verbose=True):
+    def build_all(self, min_rating=8, test_pct=0.3, verbose=True):
         if verbose:
             print("Initiate Abstraction Tree")
             self.init_abstraction_tree(min_rating)
@@ -461,7 +471,7 @@ class ConcreteAbstract:
             print("Add Positive and Negative examples")
             self.add_pos_neg_all()
             print("Fill out Train and Test sets")
-            self.fill_out_train_test()
+            self.fill_out_train_test(test_pct)
             print("Build Classifiers")
             self.build_classifiers()
             print("Done")
@@ -472,7 +482,43 @@ class ConcreteAbstract:
             self.init_abstraction_tree(min_rating)
             self.grow_abstraction_tree()
             self.add_pos_neg_all()
-            self.fill_out_train_test()
+            self.fill_out_train_test(test_pct)
             self.build_classifiers()
             tqdm = tqdm_hold
+
+    def _get_new_embeddings(self):
+        new_embeddings = deepcopy(self.word_vectors)
+        cc = self._get_classifier_capable()
+        # Start with synsets close to leaves and work our way up to more abstract hypernyms
+        # (PFI) Should this be reversed maybe?
+        cc.sort(key=self._dist2leaf)
+        processed_lemmas=[]
+        count = 0
+        for ss in cc:
+            for lemma in ss.lemmas():
+                name = lemma.name()
+                if name in new_embeddings:
+                    if name in processed_lemmas:
+                        #print("Duplicate:", name)
+                        pass
+                    else:
+                        count += 1
+                        processed_lemmas.append(name)
+                        # On duplicate, use the more concrete lemma
+                        #new_embeddings[name] = abstraction_tree.loc[ss, 'EMBEDDING']
+                    # On duplcate, use the more abstract lemma
+                    new_embeddings[name] = self.abstraction_tree.loc[ss, 'EMBEDDING']
+                
+        return new_embeddings, count
+
+    def export_embeddings(self, base_filepath):
+        new_embeddings, count = self._get_new_embeddings()
+        new_embeddings_path = "{}_r{}_p{}_n{}_t{}_c{}.txt".format(base_filepath, self.min_rating, self.pos_count, self.neg_count, self.test_pct, count)
+        with open(new_embeddings_path, 'w') as f:
+            for key in tqdm(new_embeddings.keys()):
+                f.write("{} {}\n".format(key, ' '.join(str(x) for x in new_embeddings[key])))
+        
+        print("New Embeddings Exported: ", count)
+        print("File: ", new_embeddings_path)
+        
         
