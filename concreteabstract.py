@@ -11,6 +11,7 @@ from collections import defaultdict as dd
 from operator import itemgetter
 
 class ConcreteAbstract:
+    
     def __init__(self, word_vectors, concr_scores, word_net, pos_count = 10, neg_count = 20):
         self.word_vectors = word_vectors
         self.concr_scores = concr_scores
@@ -333,6 +334,7 @@ class ConcreteAbstract:
     ########################################
     # Evaluate (vs negative examples) 
     ########################################
+    
     def comp_random_baseline(self):
         return 0.5
     
@@ -450,5 +452,27 @@ class ConcreteAbstract:
     def get_lemma_count(self):
         sum(len(ss.lemmas()) for ss in self._get_classifier_capable())
         
-        
+    def build_all(self, min_rating=8, verbose=True):
+        if verbose:
+            print("Initiate Abstraction Tree")
+            self.init_abstraction_tree(min_rating)
+            print("Grow Abstraction Tree")
+            self.grow_abstraction_tree()
+            print("Add Positive and Negative examples")
+            self.add_pos_neg_all()
+            print("Fill out Train and Test sets")
+            self.fill_out_train_test()
+            print("Build Classifiers")
+            self.build_classifiers()
+            print("Done")
+        else:
+            global tqdm
+            tqdm_hold = tqdm
+            tqdm = lambda x:x
+            self.init_abstraction_tree(min_rating)
+            self.grow_abstraction_tree()
+            self.add_pos_neg_all()
+            self.fill_out_train_test()
+            self.build_classifiers()
+            tqdm = tqdm_hold
         
