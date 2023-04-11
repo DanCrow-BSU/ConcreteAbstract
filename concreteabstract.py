@@ -5,6 +5,7 @@ from nltk.tree import Tree
 import numpy as np
 import random
 from sklearn.model_selection import train_test_split
+from sklearn.utils import shuffle
 from sklearn import metrics
 from sklearn.linear_model import LogisticRegression
 from collections import defaultdict as dd
@@ -290,7 +291,11 @@ class ConcreteAbstract:
         neg_examples = self.find_negative_examples(synset, pos_examples)
         X = pos_examples + neg_examples
         y = list(np.ones(len(pos_examples))) + list(np.zeros(len(neg_examples)))
-        return train_test_split(X, y, test_size=test_pct, stratify=y)
+        if test_pct == 0:
+            X, y = shuffle(X, y)
+            return X, [], y, []
+        else:
+            return train_test_split(X, y, test_size=test_pct, stratify=y)
     
     
     def fill_out_train_test(self, test_pct=0.3):
