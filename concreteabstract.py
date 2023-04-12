@@ -491,6 +491,11 @@ class ConcreteAbstract:
             self.build_classifiers()
             tqdm = tqdm_hold
 
+    
+    ########################################
+    # Export Embeddings
+    ########################################
+    
     def _get_new_embeddings(self):
         new_embeddings = deepcopy(self.word_vectors)
         cc = self._get_classifier_capable()
