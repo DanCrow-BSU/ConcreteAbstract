@@ -23,7 +23,7 @@ class ConcreteAbstract:
         self.neg_count = neg_count
         self.test_pct = 'tbd'
         self.min_rating = 'tbd'
-        self.tqdm_hold = tqdm
+        self.tqdm = tqdm
 
         
     ########################################
@@ -39,7 +39,7 @@ class ConcreteAbstract:
         wn_wac_words = wn_words & set(wac_words)
 
         concr_scores_subset = self.concr_scores[self.concr_scores.RATING >= min_rating]
-        leaf_words = [w for w in tqdm(wn_wac_words) if w in concr_scores_subset.index]
+        leaf_words = [w for w in self.tqdm(wn_wac_words) if w in concr_scores_subset.index]
 
         # Get Leaf Synsets...
         leaf_synsets = [self.wn.synsets(w)[0] for w in leaf_words]
@@ -111,7 +111,7 @@ class ConcreteAbstract:
         synset_list = list(self.abstraction_tree['SYNSET'])
 
         # Note: synset_list will grow as we loop through it, so tqdm may reach 100% before it's done
-        for s in tqdm(synset_list):
+        for s in self.tqdm(synset_list):
             h = s.hypernyms()
 
             if len(h) == 0:
@@ -278,7 +278,7 @@ class ConcreteAbstract:
         """Add positive and negative examples for each calssifier capable synset."""
         self.abstraction_tree['POSITIVE'] = [[]]*len(self.abstraction_tree)
         self.abstraction_tree['NEGATIVE'] = [[]]*len(self.abstraction_tree)
-        for s in tqdm(self._get_classifier_capable()):
+        for s in self.tqdm(self._get_classifier_capable()):
             self._add_positive_negative_examples(s)
 
 
@@ -306,7 +306,7 @@ class ConcreteAbstract:
         self.abstraction_tree['Y_TEST']  = [[]]*len(self.abstraction_tree)
 
         synsets = self._get_classifier_capable()
-        for s in tqdm(synsets):
+        for s in self.tqdm(synsets):
             X_train, X_test, y_train, y_test  = self._build_train_test(s, test_pct)
             self.abstraction_tree.at[s, 'X_TRAIN'] = X_train
             self.abstraction_tree.at[s, 'X_TEST']  = X_test
@@ -326,7 +326,7 @@ class ConcreteAbstract:
         cc = self._get_classifier_capable()
         # Start with synsets close to leaves and work our way up to more abstract hypernyms
         cc.sort(key=self._dist2leaf)
-        for ss in tqdm(cc):
+        for ss in self.tqdm(cc):
             #print(ss)
             X_train = self.abstraction_tree.loc[ss, 'X_TRAIN']
             y_train = self.abstraction_tree.loc[ss, 'Y_TRAIN']
@@ -429,7 +429,7 @@ class ConcreteAbstract:
         Returns a score and the computed random baseline."""
         
         grand_total_score, grand_total_tests, grand_total_possibilities = 0,0,0
-        for gold_ss in tqdm(classifiers.keys()):
+        for gold_ss in self.tqdm(classifiers.keys()):
             #print(gold_ss)
             total_score, total_tests, total_possibilities = self._test_classifier_full(classifiers, gold_ss, num_distractors)
             #print(total_score, total_tests, total_possibilities)
@@ -463,9 +463,9 @@ class ConcreteAbstract:
     def set_verbose(self, verbose=True):
         global tqdm
         if verbose:
-            tqdm = self.hold_tqdm
+            self.tqdm = tqdm
         else:
-            tqdm = lambda x:x
+            self.tqdm = lambda x:x
         
     def build_all(self, min_rating=8, test_pct=0.3, verbose=True):
         if verbose:
@@ -482,14 +482,13 @@ class ConcreteAbstract:
             print("Done")
         else:
             global tqdm
-            tqdm_hold = tqdm
-            tqdm = lambda x:x
+            self.tqdm = lambda x:x
             self.init_abstraction_tree(min_rating)
             self.grow_abstraction_tree()
             self.add_pos_neg_all()
             self.fill_out_train_test(test_pct)
             self.build_classifiers()
-            tqdm = tqdm_hold
+            self.tqdm = tqdm
 
     
     ########################################
@@ -525,7 +524,7 @@ class ConcreteAbstract:
         new_embeddings, count = self._get_new_embeddings()
         new_embeddings_path = "{}_r{}_p{}_n{}_t{}_c{}.txt".format(base_filepath, self.min_rating, self.pos_count, self.neg_count, self.test_pct, count)
         with open(new_embeddings_path, 'w') as f:
-            for key in tqdm(new_embeddings.keys()):
+            for key in self.tqdm(new_embeddings.keys()):
                 f.write("{} {}\n".format(key, ' '.join(str(x) for x in new_embeddings[key])))
         
         print("New Embeddings Exported: ", count)
