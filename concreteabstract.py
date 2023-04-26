@@ -383,11 +383,13 @@ class ConcreteAbstract:
     # Evaluate (vs other classifiers) (i.e. Distractors)
     ########################################
     
-    def _get_all_classifiers(self):
+    def _get_all_classifiers(self, min_leaf_dist=0, max_leaf_dist=1000):
         classifiers = dd(None)
         for ss in self._get_classifier_capable():
             classf = self.abstraction_tree.loc[ss, 'CLASSIFIER']
-            classifiers[ss] = classf
+            d2l = self.abstraction_tree.loc[ss, 'DIST2LEAF']
+            if min_leaf_dist <= d2l <= max_leaf_dist:
+                classifiers[ss] = classf
 
         return classifiers
     
@@ -442,11 +444,11 @@ class ConcreteAbstract:
 
         return score, baseline
     
-    def evaluate_vs_distractors(self, num_distractors=10):
+    def evaluate_vs_distractors(self, num_distractors=10, min_leaf_dist=0, max_leaf_dist=1000):
         """Evaluates all classifiers vs a number of distractors.
         Returns a score and the computed random baseline."""
         
-        classifiers = self._get_all_classifiers()
+        classifiers = self._get_all_classifiers(min_leaf_dist, max_leaf_dist)
         return self._evaluate_all_classifiers(classifiers, num_distractors)
         
         
