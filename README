@@ -1,0 +1,56 @@
+The code for this project can be downloaded from:
+
+
+...
+
+
+create the conda environment by following the steps below.
+Alternatively, if
+
+
+
+
+A a conda environment can be created with all the necesary packages by
+running the following commands:
+
+conda create -y --name conabs
+conda activate conabs
+conda install -y -c anaconda jupyter pandas numpy scikit-learn
+conda install -y -c conda-forge nltk matplotlib tqdm
+pip install svgling
+
+
+
+Files:
+evaluate.ipynb
+ - Start here for a quick demonstration of the ConcreteAbstract class.
+
+concreteabstract.py
+ - Contains the code for the ConcreteAbstract class.
+ - This is where all the real code is.
+
+documentation.ipynb
+ - Documents the code in concreteabstract.py.
+ - Read this in conjunction with reading the code
+
+concrete-abstract.ipynb
+ - Mostly the same code in the ConcreteAbstract class, but broken down into 
+   cells to make testing parts of the code easier.
+ - This file may be useful for understanding the code.
+
+explore.ipynb
+ - Code where I explore different ideas/tests.
+ - You can safely ignore this file.
+
+ddata/AC_ratings_google3m_koeper_SiW.csv
+ - The Abstract/Concrete word ratings
+ - https://aclanthology.org/L16-1413/
+ - Köper, Maximilian, and Sabine Schulte im Walde. 2016. “Automatically Generated Affective Norms of Abstractness, Arousal, Imageability and Valence for 350 000 GErman Lemmas.” In Proceedings of the Tenth International Conference on Language Resources and Evaluation (LREC’16), 2595–98. Portorož, Slovenia: European Language Resources Association (ELRA).
+
+ddata/clip.bertvocab.embeddings.513.txt
+ - WAC embeddings file
+ - http://semdial.org/anthology/Z22-Kennington_semdial_0010.pdf
+
+README
+ - This file!
+
