@@ -1,6 +1,8 @@
 The code for this project can be downloaded from:
 https://drive.google.com/drive/folders/1hUAY7ze6NliOS00dlxbTLg8V4JiH_XOR?usp=share_link
 
+
+
 Note: There is a copy of this file in the google drive folder.
 
 
@@ -65,7 +67,7 @@ ddata/clip.bertvocab.embeddings.513.txt
  - WAC embeddings file
  - Kennington, Casey, and Osama Natouf. 2022. “The Symbol Grounding Problem Re-Framed as Concreteness-Abstractness Learned through Spoken Interaction.” In Proceedings of the 26th Workshop on the Semantics and Pragmatics of Dialogue - Full Papers. http://semdial.org/anthology/papers/Z/Z22/Z22-3010/.
 
-README
+README.txt
  - This file!
 
 
