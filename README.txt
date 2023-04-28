@@ -1,6 +1,8 @@
 The code for this project can be downloaded from:
 https://drive.google.com/drive/folders/1hUAY7ze6NliOS00dlxbTLg8V4JiH_XOR?usp=share_link
 
+Alternatively the code (without the data files) is available on github:
+https://github.com/DanCrow-BSU/ConcreteAbstract
 
 
 Note: There is a copy of this file in the google drive folder.
